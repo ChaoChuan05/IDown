@@ -1,52 +1,4 @@
 from yt_dlp import YoutubeDL
-from FFmpeg import ensureFFmpeg
-import os
-
-def pathCheck(path):
-    if(os.path.exists(path)):
-    
-        if(os.path.isdir(path)):
-            return True
-        
-        else:
-            print(f"Path exists but is not a directory: {path}")
-            return False
-    
-    else:
-        try:
-            os.makedirs(path)
-            print(f"Created directory: {path}")
-            return True
-        
-        except Exception as error:
-            print(f"Failed to create directory: {error}")
-            return False
-    
-        
-def urlCheck(url):
-    try:
-        with YoutubeDL({}) as UrlCheck:
-            UrlCheck.extract_info(url, download=False)
-
-    except Exception as error:
-        print(f"Invalid URL or unsupported: {error}")
-
-
-def playlistCheck(url):
-
-    options = {
-        "quiet" : True,
-        "extract_flat" : True
-    }
-
-    try:
-        with YoutubeDL(options) as DownloadCheck:
-            info = DownloadCheck.extract_info(url, download=False)
-            return "entries" in info
-        
-    except Exception as error:
-        print(f"Error checking URL: {error}")
-        return False
 
 #d is short dictionary for yt-dlp
 def downloaderStatus(d):
@@ -66,8 +18,6 @@ def downloaderStatus(d):
 
 
 def downloader(url, mode, path, noplaylist):
-
-    ensureFFmpeg()
 
     #Donwload best quality audio only
     if(mode == "mp3"):
