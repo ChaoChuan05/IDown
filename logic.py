@@ -1,7 +1,7 @@
 from yt_dlp import YoutubeDL
 import os
 
-def pathCheck(path):
+def pathCheck(path) -> bool:
     try:
 
         #path doesn't exits, create it
@@ -23,7 +23,7 @@ def pathCheck(path):
         return False
     
         
-def urlCheck(url):
+def urlCheck(url) -> bool:
     try:
         with YoutubeDL({}) as UrlCheck:
             UrlCheck.extract_info(url, download=False)
@@ -37,6 +37,8 @@ def urlCheck(url):
 
 def playlistCheck(url):
 
+    """Return true if single video, false if playlist, none on error"""
+
     options = {
         "quiet" : True,
         "extract_flat" : True
@@ -45,17 +47,8 @@ def playlistCheck(url):
     try:
         with YoutubeDL(options) as DownloadCheck:
             info = DownloadCheck.extract_info(url, download=False)
-            
-            if("entries" in info):
-                print("\nThis URL is playlist")
-                playlist_confirm = input("\nDo you want to download the entire playlsit? (Y/N): ").strip().lower() #strip remove whitespace, while lower force everything lowercase
-                noplaylist = playlist_confirm != "y"
-                return noplaylist
-
-            else: 
-                print("\nThis is a not a playlist")
-                return True
+            return "entries" not in info
         
     except Exception as error:
         print(f"\nError checking URL: {error}")
-        return False
+        return None
