@@ -1,16 +1,15 @@
 import customtkinter as ctk
+from setting_page_manager import *
+
+WIDGET_COLOR= "#7C3AED" 
+BACKGROUND_COLOR = "#2B2543"
+HOVER_COLOR =  "#9F67FF"
+TEXT_COLOR = "#EDE9FE"
 
 class App:
 
     #Constructor
     def __init__(self) -> None:
-
-        #Color initialise
-        self.widget_coloring = "#7C3AED" 
-        self.backgrond_coloring = "#2B2543"
-        self.hover_coloring =  "#9F67FF"
-        self.text_coloring = "#EDE9FE"
-
         #Theme
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
@@ -40,19 +39,37 @@ class App:
             size=14
         )
 
+        #Tab view initialise
+        self.tab = ctk.CTkTabview(
+            self.root,
+            segmented_button_fg_color=WIDGET_COLOR,
+            segmented_button_selected_color=WIDGET_COLOR,
+            segmented_button_selected_hover_color=HOVER_COLOR,
+            text_color=TEXT_COLOR,
+            fg_color="transparent"
+            
+        )
+
+        self.tab.pack(
+            fill="both",
+            expand=True
+        )
+
+        self.main_page_tab = self.tab.add("Main Page")
+        self.setting_tab = self.tab.add("Settings")
+
         #Pages
         self.main_page()
-
-
+        self.setting_page()
 
     def main_page(self) -> None:
 
         #Title
         self.app_name_label = ctk.CTkLabel(
-            self.root,
+            self.main_page_tab,
             text="IDown",
             font=self.title_font,
-            text_color=self.text_coloring,
+            text_color=TEXT_COLOR,
         )
 
         self.app_name_label.place(
@@ -63,15 +80,15 @@ class App:
 
         #App entry
         self.app_entry = ctk.CTkEntry(
-            self.root,
+            self.main_page_tab,
             height=40,
             placeholder_text="Insert your URL here",
             font=self.input_font,
-            text_color=self.text_coloring,
-            placeholder_text_color=self.text_coloring,
+            text_color=TEXT_COLOR,
+            placeholder_text_color=TEXT_COLOR,
             corner_radius=20,
-            border_color=self.widget_coloring,
-            fg_color=self.backgrond_coloring
+            border_color=WIDGET_COLOR,
+            fg_color=BACKGROUND_COLOR
         )
 
         self.app_entry.place(
@@ -83,10 +100,10 @@ class App:
 
         #Frame for button
         self.button_frame = ctk.CTkFrame(
-            self.root,
+            self.main_page_tab,
             corner_radius=20,
             height=100,
-            fg_color=self.backgrond_coloring
+            fg_color=BACKGROUND_COLOR
         )
 
         self.button_frame.place(
@@ -113,8 +130,8 @@ class App:
             font=self.widget_font,
             width=200,
             height=80,
-            fg_color=self.widget_coloring,
-            hover_color=self.hover_coloring,
+            fg_color=WIDGET_COLOR,
+            hover_color=HOVER_COLOR,
             corner_radius=20
             #command=,
         )
@@ -131,8 +148,8 @@ class App:
             font=self.widget_font,
             width=200,
             height=80,
-            fg_color=self.widget_coloring,
-            hover_color=self.hover_coloring,
+            fg_color=WIDGET_COLOR,
+            hover_color=HOVER_COLOR,
             corner_radius=20
             #command=,
         )
@@ -145,11 +162,14 @@ class App:
 
         #Progress bar
         self.progress_bar = ctk.CTkProgressBar(
-            self.root,
+            self.main_page_tab,
             orientation="horizontal",
             mode="determinate",
             determinate_speed=10,
+            progress_color=WIDGET_COLOR
         )
+
+        self.progress_bar.set(0) #Set to 0
 
         self.progress_bar.place(
             relx=0.5,
@@ -158,11 +178,11 @@ class App:
             anchor="center"
         )
 
-        self.progress_update()
+        self.progress_bar.place_forget() #Hide the progress bar
 
         #Progress label
         self.progress_label = ctk.CTkLabel(
-            self.root,
+            self.main_page_tab,
             text="",
             font=self.input_font
         )
@@ -174,21 +194,200 @@ class App:
             anchor="center"
         )
 
+    def setting_page(self) -> None:
+        
+        self.setting_label = ctk.CTkLabel(
+            self.setting_tab,
+            text="Setting",
+            font=self.title_font,
+            text_color=TEXT_COLOR
+        )
 
-    #Function
+        self.setting_label.place(
+            relx= 0.5,
+            rely=0.1,
+            anchor="center"
+        )
+
+        #Frame for the setting list
+        self.setting_frame = ctk.CTkFrame(
+            self.setting_tab,
+            fg_color="transparent"
+        )
+
+        self.setting_frame.place(
+            relx=0.5,
+            rely=0.35,
+            relwidth=0.8,
+            relheight=0.8,
+            anchor="center"
+        )
+
+        #Inner frame for download path setting (label, entry)
+
+        self.inner_setting_path_frame = ctk.CTkFrame(
+            self.setting_frame,
+            fg_color="transparent"
+        )
+
+        self.inner_setting_path_frame.place(
+            relx=0.5,
+            rely=0.15,
+            relwidth=0.93,
+            anchor='center'
+        )
+        
+        #Setup download path and switch
+        self.settings = load_setting()
+        self.download_path_var = ctk.StringVar(value=self.settings["download_path"])
+        self.mp3_mp4_switch_var = ctk.BooleanVar(value=self.settings.get("always_mp3", True)) # load from file or default True
+        self.playlist_var = ctk.BooleanVar(value=self.settings.get("allow_playlist", True))
+
+        #Download path setting (label, entry)
+        self.download_path_label = ctk.CTkLabel(
+            self.inner_setting_path_frame,
+            text="Download Path: ",
+            font=self.widget_font,
+        )
+
+        self.download_path_label.pack(
+            side="left",
+            padx=20,
+            pady=20
+        )
+
+        self.download_path_entry = ctk.CTkEntry(
+            self.inner_setting_path_frame,
+            textvariable=self.download_path_var,
+            font=self.input_font,
+            height=40,
+            width=600,
+            text_color=TEXT_COLOR,
+            placeholder_text_color=TEXT_COLOR,
+            corner_radius=20,
+            border_color=WIDGET_COLOR,
+            fg_color=BACKGROUND_COLOR
+        )
+
+        self.download_path_entry.pack(
+            side="left",
+            padx=20,
+            pady=20
+        )
+
+        #MP3 / MP4 switching
+        self.mp3_mp4_switch = ctk.CTkSwitch(
+            self.setting_frame,
+            text="Always MP3",
+            font=self.widget_font,
+            variable=self.mp3_mp4_switch_var,
+            text_color=TEXT_COLOR,
+            button_color=WIDGET_COLOR,
+            button_hover_color=HOVER_COLOR,
+            onvalue=True,
+            offvalue=False,
+        )
+
+        self.mp3_mp4_switch.place(
+            relx = 0.5,
+            rely = 0.25,
+            relwidth=0.9,
+            anchor="n"
+        )
+
+        #Playlist checking
+        self.allow_playlist_switch = ctk.CTkSwitch(
+            self.setting_frame,
+            text="Allow Playlist",
+            font=self.widget_font,
+            variable=self.playlist_var,
+            text_color=TEXT_COLOR,
+            button_color=WIDGET_COLOR,
+            button_hover_color=HOVER_COLOR,
+            onvalue=True,
+            offvalue=False,
+        )
+
+        self.allow_playlist_switch.place(
+            relx = 0.5,
+            rely = 0.35,
+            relwidth=0.9,
+            anchor="n"
+        )
+
+        #Save button
+        self.save_button = ctk.CTkButton(
+            self.setting_frame,
+            text="Save",
+            font=self.widget_font,
+            width=200,
+            height=80,
+            fg_color=WIDGET_COLOR,
+            hover_color=HOVER_COLOR,
+            corner_radius=20,
+            command=self.save_user_setting,
+        )
+
+        self.save_button.place(
+            relx=0.5,
+            rely=0.6,
+            relwidth=0.8,
+            anchor="center"
+        )
+
+
+    def save_user_setting(self) -> None:
+        """Event handler for save button (Setting page)"""
+
+        download_path = self.download_path_var.get()
+        always_mp3 = self.mp3_mp4_switch_var.get()
+        allow_playlist = self.playlist_var.get()
+
+        save_setting({
+            "download_path" : download_path,
+            "always_mp3" : always_mp3,
+            "allow_playlist" : allow_playlist
+        })
+
+        self.show_pop_up()
+
+    def show_pop_up(self) -> None:
+
+        """Show a temporary confirmation message"""
+
+        popup = ctk.CTkFrame(
+            self.root,
+            fg_color="#4ADE80",
+            bg_color="transparent",
+        )
+
+        popup.place(
+            relx=0.5,
+            rely=0.8,
+            anchor="center"
+        )
+
+        label = ctk.CTkLabel(
+            popup,
+            text="Settings saved successfully!",
+            text_color=TEXT_COLOR,
+            font=self.widget_font
+        )
+
+        label.pack(
+            padx=20,
+            pady=20
+        )
+
+        self.root.after(2000, popup.destroy)
+
     def run(self) -> None: 
         self.root.mainloop()
-
-    def download(self) -> None:
-        pass
-
-    def clear(self) -> None:
-        pass
-
-    def progress_update(self) -> None:
-        self.progress_bar.set(0)
 
 if __name__ == "__main__":
     app = App()
     app.run()
         
+
+#Helper
+#Download status (pathcheck, urlcheck, playlistcheck)

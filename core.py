@@ -1,22 +1,5 @@
 from yt_dlp import YoutubeDL
 
-#d is short dictionary for yt-dlp
-def downloaderStatus(d):
-
-    if(d["status"] == "downloading"):
-        total = d.get("total_bytes", 0)
-        donwloaded = d.get("downloaded_bytes", 0)
-
-        if(total > 0):
-            percentage = donwloaded / total * 100
-            print(f"\rDownloading: {percentage:.2f}% ({donwloaded/1_000_000:.2f}MB/{total/1_000_000:.2f}MB)", end="")
-
-        else: print(f"\rDownloading: {donwloaded/1_000_000:.2f}MB", end="")
-
-    elif(d["status"] == "finished"):
-         print("\n✅ Done downloading, now converting...")
-
-
 def downloader(url, mode, path, noplaylist):
 
     #Donwload best quality audio only

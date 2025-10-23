@@ -4,5 +4,6 @@
 *dist/
 *__pycache__
 *main.spec
+*settings.json
 
 
