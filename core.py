@@ -74,6 +74,14 @@ def background_check(root, url, progress_bar, progress_label, app_entry, show_po
 
     def playlist_step() -> None:
         if not check_playlist(root, url, progress_bar, progress_label, app_entry, show_pop_up): return
+        root.after(500, install_step)
+
+    def install_step() -> None:
+        threading.Thread(
+            target=install,
+            args=(root, url,  progress_bar, progress_label, show_pop_up),
+            daemon=True
+        ).start()
 
     #start the chain progress
     path_step()
@@ -180,13 +188,14 @@ def path_check(root, progress_bar, progress_label) -> bool:
         root.after(0, lambda: progress_bar.set(progress))
         return True
 
-def install() -> None:
+def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
     global progress
 
     settings = load_setting()
     allow_mp3 = settings.get("always_mp3", True)
     path = settings.get("download_path", os.path.join(os.path.expanduser("~"), "Downloads"))
     allow_playlist = settings.get("allow_playlist", True)
+    progress_hook = make_install_progress(root, progress_bar, progress_label, show_pop_up)
 
 
     if allow_mp3:
@@ -195,13 +204,17 @@ def install() -> None:
             "format" : "bestaudio/best",
             "outtmpl" : f"{path}/%(title)s.%(ext)s",
             "noplaylist" : not allow_playlist,
-            "progress_hooks" : [install_progress],
+            "progress_hooks" : [progress_hook],
 
             "postprocessors" : [{
                 "key" : "FFmpegExtractAudio",
                 "preferredcodec" : "mp3",
                 "preferredquality" : "192"
             }],
+
+            "headers" : {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+            }
         }
         
     else: 
@@ -210,7 +223,13 @@ def install() -> None:
             "merge_output_format" : "mp4",
             "outtmpl" : f"{path}/%(title)s.%(ext)s",
             "noplaylist" : not allow_playlist,
-            "progress_hooks" : [install_progress],
+            "progress_hooks" : [progress_hook],
+
+            "headers" : {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+            },
+
+            "ffmpeg_location" : "../bin"
         }
 
     progress += 0.25
@@ -219,6 +238,33 @@ def install() -> None:
 
     with YoutubeDL(options) as confirm: confirm.download([url])
 
-def install_progress(d : dict) -> None:
-    ...
+def make_install_progress(root, progress_bar, progress_label, show_pop_up):
+
+    #progress hooks are always called with exactly one argument, hence nested function is implemented
+    def install_progress(d : dict):
+
+        root.after(0, lambda: progress_label.configure(text="Installing..."))
+
+        """
+            d contains key like:
+                status : "downloading" or "finished"
+                downloaded_bytes
+                total bytes
+                filename
+        """
+        if d["status"] == "downloading":
+            downloaded = d.get("downloaded_bytes", 0)
+            total = d.get("total_bytes") or d.get("total_bytes_estimate")
+            percent = (downloaded / total * 100) if total else 0.0
+            root.after(0, lambda: progress_bar.set(percent / 100))
+            root.after(0, lambda: progress_label.configure(text=f"({percent:.1f}%)"))
+    
+        elif d["status"] == "finished":
+            root.after(0, lambda: progress_bar.set(1.0))
+            root.after(0, lambda: progress_label.configure(text="Download finished!"))
+            root.after(0, lambda: show_pop_up("Download finished!", "#4ADE80"))
+
+    return install_progress
+
+   
 

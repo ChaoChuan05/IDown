@@ -398,5 +398,3 @@ if __name__ == "__main__":
     app.run()
         
 
-#Helper
-#Download status (pathcheck, urlcheck, playlistcheck)
