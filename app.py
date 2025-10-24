@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from setting_page_manager import *
+from core import start_download
+from yt_dlp import YoutubeDL
 
 WIDGET_COLOR= "#7C3AED" 
 BACKGROUND_COLOR = "#2B2543"
@@ -132,8 +134,8 @@ class App:
             height=80,
             fg_color=WIDGET_COLOR,
             hover_color=HOVER_COLOR,
-            corner_radius=20
-            #command=,
+            corner_radius=20,
+            command=self.download,
         )
 
         self.download_button.pack(
@@ -150,8 +152,8 @@ class App:
             height=80,
             fg_color=WIDGET_COLOR,
             hover_color=HOVER_COLOR,
-            corner_radius=20
-            #command=,
+            corner_radius=20,
+            command=self.clear_url
         )
 
         self.clear_button.pack(
@@ -169,29 +171,11 @@ class App:
             progress_color=WIDGET_COLOR
         )
 
-        self.progress_bar.set(0) #Set to 0
-
-        self.progress_bar.place(
-            relx=0.5,
-            rely=0.5,
-            relwidth=0.5,
-            anchor="center"
-        )
-
-        self.progress_bar.place_forget() #Hide the progress bar
-
         #Progress label
         self.progress_label = ctk.CTkLabel(
             self.main_page_tab,
             text="",
             font=self.input_font
-        )
-
-        self.progress_label.place(
-            relx=0.5,
-            rely=0.6,
-            relwidth=0.5,
-            anchor="center"
         )
 
     def setting_page(self) -> None:
@@ -335,7 +319,31 @@ class App:
             anchor="center"
         )
 
+    #Main page function
+    def download(self) -> None:
+        url = self.app_entry.get()
 
+        start_download(
+            self.root, 
+            url, 
+            self.progress_bar,
+            self.progress_label,
+            self.app_entry,
+            self.show_pop_up
+        )
+         
+
+    def clear_url(self) -> None:
+
+        current_text = self.app_entry.get()
+
+        if current_text.strip():
+            self.app_entry.delete(0, "end")
+            self.show_pop_up("Successfully deleted!", "#4ADE80")
+        
+        else: self.show_pop_up("Nothing to delete!", "#E30B5C")
+
+    #Setting page function
     def save_user_setting(self) -> None:
         """Event handler for save button (Setting page)"""
 
@@ -349,15 +357,16 @@ class App:
             "allow_playlist" : allow_playlist
         })
 
-        self.show_pop_up()
+        self.show_pop_up("Settings saved successfully!", "#4ADE80")
 
-    def show_pop_up(self) -> None:
+    #Other
+    def show_pop_up(self, text : str, frame_color : str) -> None:
 
         """Show a temporary confirmation message"""
 
         popup = ctk.CTkFrame(
             self.root,
-            fg_color="#4ADE80",
+            fg_color=frame_color,
             bg_color="transparent",
         )
 
@@ -369,7 +378,7 @@ class App:
 
         label = ctk.CTkLabel(
             popup,
-            text="Settings saved successfully!",
+            text=text,
             text_color=TEXT_COLOR,
             font=self.widget_font
         )

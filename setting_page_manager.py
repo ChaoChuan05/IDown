@@ -22,3 +22,4 @@ def save_setting(new_data : dict) -> None:
         json.dump(settings, f, indent=4)
 
 
+
