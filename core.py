@@ -264,6 +264,32 @@ def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
     allow_playlist = settings.get("allow_playlist", True)
     progress_hook = make_install_progress(root, progress_bar, progress_label, show_pop_up)
 
+    #Determine ffmpeg path (supports PyInstaller)
+    if getattr(sys, "frozen", False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    ffmpeg_path = os.path.join(base_path, "ffmpeg_window", "ffmpeg.exe")
+
+    #Verify ffmpeg is runnable
+    try:
+        result = subprocess.run(
+            [ffmpeg_path, "-version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+            text=True,
+            timeout=5,
+        )
+
+        print("FFmpeg check OK ✅")
+        print("Using ffmpeg from:", ffmpeg_path)
+
+    except Exception as e:
+        print(f"⚠️ FFmpeg not found or failed to run: {e}")
+        show_pop_up("Error", f"FFmpeg not found or failed to run:\n{e}")
+        return  # Stop before download if ffmpeg is missing
 
     if allow_mp3:
 
@@ -286,7 +312,9 @@ def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
             },
 
             "prefer_ffmpeg" : True,
-            "ffmpeg_location" : ffmpeg_path
+            "ffmpeg_location" : ffmpeg_path,
+            "overwrites" : True,
+            "cleanup" : True
         }
         
     else: 
@@ -304,7 +332,9 @@ def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
             },
 
             "prefer_ffmpeg" : True,
-            "ffmpeg_location" : ffmpeg_path
+            "ffmpeg_location" : ffmpeg_path,
+            "overwrites" : True,
+            "cleanup" : True
         }
 
     progress += 0.25

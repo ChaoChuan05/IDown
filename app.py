@@ -22,10 +22,10 @@ class App:
 
         if getattr(sys, 'frozen', False):
             # If running as bundled EXE, use temp folder PyInstaller extracts
-            icon_path = os.path.join(sys._MEIPASS, "icon.ico")
+            icon_path = os.path.join(sys._MEIPASS, "Icon.ico")
         else:
             # If running as script, use local path
-            icon_path = os.path.join(os.path.dirname(__file__), "icon.ico")
+            icon_path = os.path.join(os.path.dirname(__file__), "Icon.ico")
 
         self.root.iconbitmap(icon_path)
 

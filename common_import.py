@@ -11,4 +11,3 @@ import json
 
 # Local modules
 from setting_page_manager import *
-from ffmpeg_wrapper import ffmpeg_path

@@ -1,0 +1,5 @@
+//For debug purpose
+pyinstaller --onefile --console --name "IDown" --add-data "Icon.ico;." --add-binary "D:\Code\ffmpeg_window\ffmpeg.exe;ffmpeg_window" --collect-all yt_dlp --collect-all customtkinter app.py
+
+//GUI version
+pyinstaller --onefile --noconsole --name "IDown" --add-data "Icon.ico;." --add-binary "D:\Code\ffmpeg_window\ffmpeg.exe;ffmpeg_window" --collect-all yt_dlp --collect-all customtkinter app.py
