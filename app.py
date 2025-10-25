@@ -1,7 +1,5 @@
-import customtkinter as ctk
-from setting_page_manager import *
-from core import start_download
-from yt_dlp import YoutubeDL
+from common_import import *
+from core import start_download, monitor_network
 
 WIDGET_COLOR= "#7C3AED" 
 BACKGROUND_COLOR = "#2B2543"
@@ -19,7 +17,7 @@ class App:
         #Window
         self.root = ctk.CTk()
         self.root.title("IDown")
-        self.root.minsize(800, 800)
+        self.root.minsize(800, 700) #width x height
         self.root.resizable(True, True) #width x height
         self.root.iconbitmap("Icon.ico")
 
@@ -63,6 +61,9 @@ class App:
         #Pages
         self.main_page()
         self.setting_page()
+
+        #start monitor network once when app starts
+        monitor_network(self.root, self.show_pop_up)
 
     def main_page(self) -> None:
 
@@ -331,7 +332,6 @@ class App:
             self.app_entry,
             self.show_pop_up
         )
-         
 
     def clear_url(self) -> None:
 
