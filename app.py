@@ -19,7 +19,15 @@ class App:
         self.root.title("IDown")
         self.root.minsize(800, 700) #width x height
         self.root.resizable(True, True) #width x height
-        self.root.iconbitmap("Icon.ico")
+
+        if getattr(sys, 'frozen', False):
+            # If running as bundled EXE, use temp folder PyInstaller extracts
+            icon_path = os.path.join(sys._MEIPASS, "icon.ico")
+        else:
+            # If running as script, use local path
+            icon_path = os.path.join(os.path.dirname(__file__), "icon.ico")
+
+        self.root.iconbitmap(icon_path)
 
         #Font family initialise
         self.title_font = ctk.CTkFont(

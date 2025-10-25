@@ -272,6 +272,8 @@ def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
             "outtmpl" : f"{path}/%(title)s.%(ext)s",
             "noplaylist" : not allow_playlist,
             "progress_hooks" : [progress_hook],
+            "keepvideo" : False,
+            "postprocessor_args": ["-y"],
 
             "postprocessors" : [{
                 "key" : "FFmpegExtractAudio",
@@ -283,6 +285,7 @@ def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
             },
 
+            "prefer_ffmpeg" : True,
             "ffmpeg_location" : ffmpeg_path
         }
         
@@ -293,11 +296,14 @@ def install(root, url, progress_bar, progress_label, show_pop_up) -> None:
             "outtmpl" : f"{path}/%(title)s.%(ext)s",
             "noplaylist" : not allow_playlist,
             "progress_hooks" : [progress_hook],
+            "keepvideo" : False,
+            "postprocessor_args": ["-y"],  # same reason
 
             "headers" : {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
             },
 
+            "prefer_ffmpeg" : True,
             "ffmpeg_location" : ffmpeg_path
         }
 

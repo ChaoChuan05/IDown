@@ -6,7 +6,17 @@ if getattr(sys, 'frozen', False):
 else:
     base_path = os.path.abspath(".")
 
-ffmpeg_path = r"D:\Code\ffmpeg-8.0-essentials_build\bin\ffmpeg.exe"
+#path inside packaged EXE
+ffmpeg_path = os.path.join(base_path, "ffmpeg_window", "ffmpeg.exe")
 
 # Use ffmpeg
-subprocess.run([ffmpeg_path, "-version"])
+try:
+    subprocess.run(
+        [ffmpeg_path, "-version"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        creationflags=subprocess.CREATE_NO_WINDOW
+    )
+    
+except Exception as e:
+    print(f"FFmpeg not found or failed to run: {e}")

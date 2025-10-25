@@ -7,6 +7,7 @@ import sys
 import subprocess
 import time
 import socket
+import json
 
 # Local modules
 from setting_page_manager import *
